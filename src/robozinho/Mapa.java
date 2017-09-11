@@ -33,4 +33,13 @@ public class Mapa {
 	public int[] getCarregadores() {
 		return carregadores;
 	}
-}
+
+
+ 	public int tamanhoX(){
+ 		return mapa.length;
+ 	}
+ 	
+ 	public int tamanhoY(){
+ 		return mapa[0].length;
+ 	}
+ 	}

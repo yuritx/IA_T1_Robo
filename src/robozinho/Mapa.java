@@ -7,30 +7,30 @@ package robozinho;
 public class Mapa {
 
 	
-	private int [][] mapa;
-	private int [] carregadores;
-	private int [] lixeiras;
+	private Nodo [][] mapa;
+	private Nodo [] carregadores;
+	private Nodo [] lixeiras;
 	public Mapa(int largura, int altura){
-		mapa = new int[largura][altura];
+		mapa = new Nodo[largura][altura];
 		
 	}
 	
 	public void	limpaEspaco (int x, int y){
 		
-		mapa[x][y] = 0;
+		mapa[x][y].status= 0;
 	}
 	
 	public int estadoPosicao(int x, int y){
-		return mapa[x][y];
+		return mapa[x][y].status;
 		
 	}
 
 
-	public int[] getLixeiras(){
+	public Nodo[] getLixeiras(){
 		return lixeiras;
 	}
 
-	public int[] getCarregadores() {
+	public Nodo[] getCarregadores() {
 		return carregadores;
 	}
 
@@ -42,4 +42,5 @@ public class Mapa {
  	public int tamanhoY(){
  		return mapa[0].length;
  	}
- 	}
+ 	public Nodo[][] getMapa (){ return mapa;}
+}

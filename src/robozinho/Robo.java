@@ -21,16 +21,16 @@ public class Robo {
 	
 	public void resetaCapacidade(Mapa map){
 		int cout =0;
-		int [] lixeiras = map.getLixeiras();
+		Nodo [] lixeiras = map.getLixeiras();
 		
-		ArrayList<String> resposta = new ArrayList<String>();
+		ArrayList<Nodo> resposta = new ArrayList<Nodo>();
 		while(cout < lixeiras.length){
 		 
 		if(resposta.size() == 0){ 
-			resposta = aStar(xRobo, yRobo, lixeiras[cout], lixeiras[cout+1], map);
+			resposta = aStar( lixeiras[cout], map);
 			}
 		else{ 
-			ArrayList <String> aux = aStar(xRobo, yRobo, lixeiras[cout], lixeiras[cout+1], map);
+			ArrayList <Nodo> aux = aStar( lixeiras[cout], map);
 			if(aux.size() < resposta.size()) resposta = aux;
 		}
 		cout +=2;
@@ -41,16 +41,16 @@ public class Robo {
 	public void recarregar(Mapa map){
 		
 		int cout =0;
-		int [] carregadores = map.getCarregadores();
+		Nodo [] carregadores = map.getCarregadores();
 		
-		ArrayList<String> resposta = new ArrayList<String>();
+		ArrayList<Nodo> resposta = new ArrayList<Nodo>();
 		while(cout < carregadores.length){
 		 
 		if(resposta.size() == 0){ 
-			resposta = aStar(xRobo, yRobo, carregadores[cout], carregadores[cout+1],map);
+			resposta = aStar( carregadores[cout],map);
 			}
 		else{ 
-			ArrayList <String> aux = aStar(xRobo, yRobo, carregadores[cout], carregadores[cout+1],map);
+			ArrayList <Nodo> aux = aStar(carregadores[cout],map);
 			if(aux.size() < resposta.size()) resposta = aux;
 		}
 		cout +=2;
@@ -103,62 +103,110 @@ public class Robo {
 	}
 
 
-	public ArrayList<String> aStar(int xInicial, int yInicial, int xFinal, int yFinal, Mapa map){
+	public ArrayList<Nodo> aStar( Nodo rep, Mapa map){
 		
 		
 		
 		ArrayList closedSet = new ArrayList <Nodo>();
 		ArrayList openSet = new ArrayList <Nodo>();
-		Nodo [][] nodos = new Nodo[map.tamanhoX()][map.tamanhoY()];
+		Nodo [][] nodos = map.getMapa();
 	
 		for(int xa=0; xa< nodos.length ; xa++){
 			for(int ya=0; ya< nodos[0].length ; ya++){
-				nodos[xa][ya].x = xa;
-				nodos[xa] [ya].y= ya;
+				nodos[xa][ya].heuristica = Math.abs((xa-rep.x)*10) + Math.abs((ya-rep.y)*10);
+						
 			}
 		}
-		Nodo inicial = nodos[xInicial][yInicial];
-		Nodo goal = nodos[xFinal][yFinal];
+		
+		for(int xa=0; xa< nodos.length ; xa++){
+			for(int ya=0; ya< nodos[0].length ; ya++){
+				nodos[xa][ya].nodosHortogonais.add(nodos[xa-1][ya]);
+				nodos[xa][ya].nodosHortogonais.add(nodos[xa+1][ya]);
+				nodos[xa][ya].nodosHortogonais.add(nodos[xa][ya-1]);
+				nodos[xa][ya].nodosHortogonais.add(nodos[xa][ya+1]);
+				
+				nodos[xa][ya].nodosTransversais.add(nodos[xa-1][ya-1]);
+				nodos[xa][ya].nodosTransversais.add(nodos[xa-1][ya+1]);
+				nodos[xa][ya].nodosTransversais.add(nodos[xa+1][ya+1]);
+				nodos[xa][ya].nodosTransversais.add(nodos[xa+1][ya-1]);
+			}
+		}
+		
+		
+		Nodo inicial = nodos[xRobo][yRobo];
+		Nodo goal = nodos[rep.x][rep.y];
 		openSet.add(inicial);
+		
 		inicial.gScore = 0;
 		
 		//inicial.fscore = heuristica(inicial, final);
 
 	 	 
 	    while (openSet.size() >0){
-	       Nodo current = new Nodo(0,0,0); //= menor fscore em openSet;
+	       Nodo current = melhorFscore(openSet); //= menor fscore em openSet;
 	        if (current == goal){
-	             reconstruct_path(inicial, current);
+	           return caminho(inicial, current);
 	        }
 	        openSet.remove(current);
 	        closedSet.add(current);
-
-	        //for each neighbor of current
-	           // if neighbor in closedSet
-	               //continue		// Ignore the neighbor which is already evaluated.
-
-	         //  if neighbor not in openSet	// Discover a new node
-	               // openSet.Add(neighbor)
-	            
-	            // The distance from start to a neighbor
-	           // tentative_gScore := gScore[current] + dist_between(current, neighbor)
-	            //if tentative_gScore >= gScore[neighbor]
-	              //  continue		// This is not a better path.
-
-	            // This path is the best until now. Record it!
-	            //cameFrom[neighbor] := current
-	            //gScore[neighbor] := tentative_gScore
-	            //fScore[neighbor] := gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
+	        
+	        for(Nodo n: current.nodosTransversais){
+	        if(!(closedSet.contains(n))){
+	        	if(n.gScore==-1){
+	        		n.gScore= current.gScore + 14;
+	        		n.pai= current;
+	        		n.fScore = n.gScore + n.heuristica;
+	        	}
+	        		else{
+	        		if(n.gScore>=  current.gScore+14){
+	        			n.gScore =  current.gScore+14;
+	        			n.pai= current;
+	        			n.fScore = n.gScore + n.heuristica;
+	        		}
+	        	}
+	        	openSet.add(n);
+	        }
+	        }
+	        for(Nodo n: current.nodosHortogonais){
+	        	n = nodos[current.x+1][current.y+1];
+	        	if(!(closedSet.contains(n))){
+	        		if(n.gScore==-1){
+	        			n.gScore= current.gScore + 10;
+	        			n.pai= current;
+	        			n.fScore = n.gScore + n.heuristica;
+	        		}
+	        			else{
+	        				if(n.gScore>=  current.gScore+14){
+	        					n.gScore =  current.gScore+14;
+	        					n.pai= current;
+	        					n.fScore = n.gScore + n.heuristica;
+	        				}
+	        			}
+	        	openSet.add(n);
+	        	}
+	        }
 	    }
-	    return null;
+	    return caminho(inicial, goal);
 	    }
-	public void reconstruct_path(Nodo cameFrom, Nodo current){
-	    Nodo total_path = current;
+	
+	private Nodo melhorFscore(ArrayList<Nodo> openSet) {
+		Nodo aux = null;
+		for(int i = 0; i<openSet.size();i++){
+			if(i==0) aux = openSet.get(0);
+			if(aux.fScore > openSet.get(i).fScore) aux = openSet.get(i);
+		}
+		return aux;
+	}
+
+
+	public ArrayList<Nodo> caminho(Nodo start, Nodo goal){
+	    
 	    //while (current in cameFrom.Keys){
 	      //  current := cameFrom[current]
 	       // total_path.append(current)
 	    //}
 	   // return total_path
+		return null;
 	}
 		
 		

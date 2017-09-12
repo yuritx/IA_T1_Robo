@@ -113,24 +113,14 @@ public class Robo {
 	
 		for(int xa=0; xa< nodos.length ; xa++){
 			for(int ya=0; ya< nodos[0].length ; ya++){
+				nodos[xa][ya].gScore=Integer.MAX_VALUE;
+				nodos[xa][ya].fScore= 0;
 				nodos[xa][ya].heuristica = Math.abs((xa-rep.x)*10) + Math.abs((ya-rep.y)*10);
 						
 			}
 		}
-		
-		for(int xa=0; xa< nodos.length ; xa++){
-			for(int ya=0; ya< nodos[0].length ; ya++){
-				nodos[xa][ya].nodosHortogonais.add(nodos[xa-1][ya]);
-				nodos[xa][ya].nodosHortogonais.add(nodos[xa+1][ya]);
-				nodos[xa][ya].nodosHortogonais.add(nodos[xa][ya-1]);
-				nodos[xa][ya].nodosHortogonais.add(nodos[xa][ya+1]);
-				
-				nodos[xa][ya].nodosTransversais.add(nodos[xa-1][ya-1]);
-				nodos[xa][ya].nodosTransversais.add(nodos[xa-1][ya+1]);
-				nodos[xa][ya].nodosTransversais.add(nodos[xa+1][ya+1]);
-				nodos[xa][ya].nodosTransversais.add(nodos[xa+1][ya-1]);
-			}
-		}
+	
+	
 		
 		
 		Nodo inicial = nodos[xRobo][yRobo];
@@ -139,7 +129,7 @@ public class Robo {
 		
 		inicial.gScore = 0;
 		
-		//inicial.fscore = heuristica(inicial, final);
+		inicial.fScore = 0;
 
 	 	 
 	    while (openSet.size() >0){
@@ -152,39 +142,26 @@ public class Robo {
 	        
 	        for(Nodo n: current.nodosTransversais){
 	        if(!(closedSet.contains(n))){
-	        	if(n.gScore==-1){
-	        		n.gScore= current.gScore + 14;
+	        	if(n.gScore>=  current.gScore+14){
+	        		n.gScore =  current.gScore+14;
 	        		n.pai= current;
 	        		n.fScore = n.gScore + n.heuristica;
-	        	}
-	        		else{
-	        		if(n.gScore>=  current.gScore+14){
-	        			n.gScore =  current.gScore+14;
-	        			n.pai= current;
-	        			n.fScore = n.gScore + n.heuristica;
 	        		}
-	        	}
-	        	openSet.add(n);
+	        	
+	        	 if(!(openSet.contains(n))){openSet.add(n);}
 	        }
 	        }
 	        for(Nodo n: current.nodosHortogonais){
-	        	n = nodos[current.x+1][current.y+1];
-	        	if(!(closedSet.contains(n))){
-	        		if(n.gScore==-1){
-	        			n.gScore= current.gScore + 10;
-	        			n.pai= current;
-	        			n.fScore = n.gScore + n.heuristica;
-	        		}
-	        			else{
-	        				if(n.gScore>=  current.gScore+14){
-	        					n.gScore =  current.gScore+14;
-	        					n.pai= current;
-	        					n.fScore = n.gScore + n.heuristica;
-	        				}
-	        			}
-	        	openSet.add(n);
-	        	}
-	        }
+		        if(!(closedSet.contains(n))){
+		        	if(n.gScore>=  current.gScore+10){
+		        		n.gScore =  current.gScore+10;
+		        		n.pai= current;
+		        		n.fScore = n.gScore + n.heuristica;
+		        		}
+		        	
+		        	if(!(openSet.contains(n))){	openSet.add(n);}
+		        }
+		        }
 	    }
 	    return caminho(inicial, goal);
 	    }
@@ -193,7 +170,9 @@ public class Robo {
 		Nodo aux = null;
 		for(int i = 0; i<openSet.size();i++){
 			if(i==0) aux = openSet.get(0);
-			if(aux.fScore > openSet.get(i).fScore) aux = openSet.get(i);
+			else{
+				if(aux.fScore > openSet.get(i).fScore) aux = openSet.get(i);
+				}
 		}
 		return aux;
 	}
@@ -201,11 +180,14 @@ public class Robo {
 
 	public ArrayList<Nodo> caminho(Nodo start, Nodo goal){
 	    
-	    //while (current in cameFrom.Keys){
-	      //  current := cameFrom[current]
-	       // total_path.append(current)
-	    //}
-	   // return total_path
+		Nodo atual = goal;
+		ArrayList<Nodo> temporaria = new ArrayList<Nodo>();
+		
+	 while(atual != goal){
+		 atual = atual.pai;
+		 temporaria.add(atual);
+		
+	 }
 		return null;
 	}
 		

@@ -43,4 +43,29 @@ public class Mapa {
  		return mapa[0].length;
  	}
  	public Nodo[][] getMapa (){ return mapa;}
+
+
+	private void iniciaNodos(){
+		
+		
+		for(int xa=0; xa< mapa.length ; xa++){
+			for(int ya=0; ya< mapa[0].length ; ya++){
+				mapa[xa][ya]= new Nodo(xa,ya,0);
+						
+			}
+		}
+		for(int xa=0; xa< mapa.length ; xa++){
+			for(int ya=0; ya< mapa[0].length ; ya++){
+				mapa[xa][ya].nodosHortogonais.add(mapa[xa-1][ya]);
+				mapa[xa][ya].nodosHortogonais.add(mapa[xa+1][ya]);
+				mapa[xa][ya].nodosHortogonais.add(mapa[xa][ya-1]);
+				mapa[xa][ya].nodosHortogonais.add(mapa[xa][ya+1]);
+				
+				mapa[xa][ya].nodosTransversais.add(mapa[xa-1][ya-1]);
+				mapa[xa][ya].nodosTransversais.add(mapa[xa-1][ya+1]);
+				mapa[xa][ya].nodosTransversais.add(mapa[xa+1][ya+1]);
+				mapa[xa][ya].nodosTransversais.add(mapa[xa+1][ya-1]);
+			}
+		}
+	}
 }

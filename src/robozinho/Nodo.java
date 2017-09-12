@@ -19,7 +19,7 @@ public class Nodo {
 		int x = posX;
 		int y = posY;
 		int heuristica = heuristic;
-		gScore = -1;
+		gScore = Integer.MAX_VALUE;
 		fScore = 0;
 		pai = null;
 	}
